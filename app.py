@@ -4,6 +4,7 @@ from flask_cors import CORS
 import requests
 import json
 from flask_socketio import SocketIO, emit
+import os
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -66,7 +67,7 @@ def createProject(course, module, pgname):
 @app.route('/oauth2response', methods=['GET', 'POST'])
 def oauth():
     code = request.args.get('code', None)
-    socketio.emit('my response', {'code': code, 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
+    socketio.emit('my response', {'code': code, 'client_id': os.environ['CLIENT_ID'], 'client_secret': os.environ['CLIENT_SECRET']})
     return redirect('https://dreamworthie.com/wait')
 
 @app.route('/home', methods=['POST'])
