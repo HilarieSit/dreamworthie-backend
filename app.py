@@ -7,7 +7,7 @@ from flask_socketio import SocketIO, emit
 import os
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="https://dreamworthie.com")
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
