@@ -6,6 +6,11 @@ import json
 from flask_socketio import SocketIO, emit
 import os
 
+from rq import Queue
+from worker import conn
+
+q = Queue(connection=conn)
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 cors = CORS(app)
@@ -64,6 +69,22 @@ def createProject(course, module, pgname):
     module.create_module_item({'content_id': project_id, 'type': 'assignment'})
     return project
 
+def populateCanvas(formdata, course):
+    for [pgtype, pgname] in formdata.values():
+        if pgtype == "module":
+            module = course.create_module({'name': pgname})
+        elif pgtype == "assignment":
+            _ = createAssignment(course, module, pgtype, pgname)
+        elif pgtype == "quiz":
+            _ = createQuiz(course, module, pgtype, pgname)
+        elif pgtype == "discussion":
+            _ = createDiscussion(course, module, pgtype)
+        elif pgtype == "project":
+            _ = createProject(course, module, pgname)
+        else:
+            _ = createPage(course, module, pgtype, pgname)
+
+
 @app.route('/oauth2response', methods=['GET', 'POST'])
 def oauth():
     code = request.args.get('code', None)
@@ -80,20 +101,9 @@ def createCourse():
     course = canvas.get_course(int(coursecode))
 
     formdata = data['data']
-    for [pgtype, pgname] in formdata.values():
-        if pgtype == "module":
-            module = course.create_module({'name': pgname})
-        elif pgtype == "assignment":
-            _ = createAssignment(course, module, pgtype, pgname)
-        elif pgtype == "quiz":
-            _ = createQuiz(course, module, pgtype, pgname)
-        elif pgtype == "discussion":
-            _ = createDiscussion(course, module, pgtype)
-        elif pgtype == "project":
-            _ = createProject(course, module, pgname)
-        else:
-            _ = createPage(course, module, pgtype, pgname)
-    return success_response(data)
+    result = q.enqueue(populateCanvas, formdata, course)
+
+    return success_response(result)
 
 @app.route('/redirect', methods=['POST'])
 def proxy():
