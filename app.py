@@ -79,13 +79,10 @@ def populateCanvas(formdata, course):
         else:
             _ = createPage(course, module, pgtype, pgname)
 
-def ack():
-    print('message was received!')
-
 @app.route('/oauth2response', methods=['GET', 'POST'])
 def oauth():
     code = request.args.get('code', None)
-    emit('my response', {'code': code, 'client_id': os.environ['CLIENT_ID'], 'client_secret': os.environ['CLIENT_SECRET']})
+    socketio.emit('my response', {'code': code, 'client_id': os.environ['CLIENT_ID'], 'client_secret': os.environ['CLIENT_SECRET']})
     return redirect('http://localhost:8080/wait')
 
 @app.route('/home', methods=['POST'])
