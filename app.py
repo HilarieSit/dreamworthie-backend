@@ -85,7 +85,7 @@ def ack():
 @app.route('/oauth2response', methods=['GET', 'POST'])
 def oauth():
     code = request.args.get('code', None)
-    socketio.emit('my response', {'code': code, 'client_id': os.environ['CLIENT_ID'], 'client_secret': os.environ['CLIENT_SECRET']}, callback=ack)
+    emit('my response', {'code': code, 'client_id': os.environ['CLIENT_ID'], 'client_secret': os.environ['CLIENT_SECRET']})
     return redirect('http://localhost:8080/wait')
 
 @app.route('/home', methods=['POST'])
