@@ -6,11 +6,6 @@ import json
 from flask_socketio import SocketIO, emit
 import os
 
-from rq import Queue
-from worker import conn
-
-q = Queue(connection=conn)
-
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 cors = CORS(app)
@@ -101,9 +96,9 @@ def createCourse():
     course = canvas.get_course(int(coursecode))
 
     formdata = data['data']
-    result = q.enqueue(populateCanvas, formdata, course)
+    populateCanvas(formdata, course)
 
-    return success_response(result)
+    return success_response(formdata)
 
 @app.route('/redirect', methods=['POST'])
 def proxy():
