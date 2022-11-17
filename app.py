@@ -3,17 +3,21 @@ from flask import Flask, request, redirect, Response
 from flask_cors import CORS
 import requests
 import json
-from flask_socketio import SocketIO, emit
+# from flask_socketio import SocketIO, emit
 import os
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+# socketio = SocketIO(app, cors_allowed_origins="*")
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Canvas API URL
 API_URL = "https://ecornell.beta.instructure.com"
+CLIENT_ID = os.environ['CLIENT_ID']
+CLIENT_SECRET = os.environ['CLIENT_SECRET']
+CODE = 0
 SITE_NAME = 'https://ecornell.beta.instructure.com/login/oauth2/token'
+SITE_NAME2 = 'https://ecornell.beta.instructure.com/login/oauth2/auth?client_id='+CLIENT_ID+'&response_type=code&state=YYY&redirect_uri=http://localhost:5000/oauth2response'
 
 def success_response(data, code=200):
     return json.dumps({"success": True, "data": data}), code
@@ -81,10 +85,10 @@ def populateCanvas(formdata, course):
 
 @app.route('/oauth2response', methods=['GET', 'POST'])
 def oauth():
-    code = request.args.get('code', None)
-    socketio.emit('my response', {'code': code, 'client_id': os.environ['CLIENT_ID'], 'client_secret': os.environ['CLIENT_SECRET']})
-    # return redirect('http://localhost:8080/wait')
-    return success_response(code)
+    global CODE
+    CODE = request.args.get('code', None)
+    # socketio.emit('my response', {'code': code, 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
+    return redirect('http://localhost:8080/wait')
 
 @app.route('/home', methods=['POST'])
 def createCourse():
@@ -97,17 +101,21 @@ def createCourse():
 
     formdata = data['data']
     populateCanvas(formdata, course)
-
     return success_response(formdata)
 
 @app.route('/redirect', methods=['POST'])
 def proxy():
     resp = requests.post(SITE_NAME, json=request.get_json())
+    print(resp.status_code)
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
     response = Response(resp.content, resp.status_code, headers)
     return response
 
+@app.route('/redirect2', methods=['GET'])
+def getproxy():
+    return success_response({'code': CODE, 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
+
 if __name__ == '__main__':
-    # app.run(debug=True)
-    socketio.run(app, port=5000)
+    app.run(debug=True)
+    # socketio.run(app, port=5000, debug=True)
