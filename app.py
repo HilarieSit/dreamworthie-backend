@@ -17,7 +17,7 @@ CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
 CODE = 0
 TOKEN_LINK = 'https://ecornell.beta.instructure.com/login/oauth2/token'
-REDIRECT_LINK = 'https://ecornell.beta.instructure.com/login/oauth2/auth?client_id='+CLIENT_ID+'&response_type=code&state=YYY&redirect_uri=http://localhost:5000/oauth2response'
+REDIRECT_LINK = 'https://ecornell.beta.instructure.com/login/oauth2/auth?client_id='+CLIENT_ID+'&response_type=code&state=YYY&redirect_uri=https://dreamworthie-populate-canvas.herokuapp.com/oauth2response'
 
 def success_response(data, code=200):
     return json.dumps({"success": True, "data": data}), code
