@@ -88,7 +88,7 @@ def oauth():
     global CODE
     CODE = request.args.get('code', None)
     # socketio.emit('my response', {'code': code, 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
-    return redirect('https://dreamworthie.com/wait')
+    return redirect('http://localhost:8080/wait')
 
 @app.route('/home', methods=['POST'])
 def createCourse():
