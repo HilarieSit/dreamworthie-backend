@@ -16,8 +16,8 @@ API_URL = "https://ecornell.beta.instructure.com"
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
 CODE = 0
-SITE_NAME = 'https://ecornell.beta.instructure.com/login/oauth2/token'
-SITE_NAME2 = 'https://ecornell.beta.instructure.com/login/oauth2/auth?client_id='+CLIENT_ID+'&response_type=code&state=YYY&redirect_uri=http://localhost:5000/oauth2response'
+TOKEN_LINK = 'https://ecornell.beta.instructure.com/login/oauth2/token'
+REDIRECT_LINK = 'https://ecornell.beta.instructure.com/login/oauth2/auth?client_id='+CLIENT_ID+'&response_type=code&state=YYY&redirect_uri=http://localhost:5000/oauth2response'
 
 def success_response(data, code=200):
     return json.dumps({"success": True, "data": data}), code
@@ -105,16 +105,19 @@ def createCourse():
 
 @app.route('/redirect', methods=['POST'])
 def proxy():
-    resp = requests.post(SITE_NAME, json=request.get_json())
-    print(resp.status_code)
+    resp = requests.post(TOKEN_LINK, json=request.get_json())
     excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
     headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
     response = Response(resp.content, resp.status_code, headers)
     return response
 
-@app.route('/redirect2', methods=['GET'])
-def getproxy():
+@app.route('/getcode', methods=['GET'])
+def getcode():
     return success_response({'code': CODE, 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
+
+@app.route('/geturl', methods=['GET'])
+def geturl():
+    return success_response({'url': REDIRECT_LINK})
 
 if __name__ == '__main__':
     app.run(debug=True)
