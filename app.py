@@ -12,12 +12,12 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Canvas API URL
-API_URL = "https://lms.ecornell.com"
+API_URL = "https://https://ecornell.beta.instructure.com"
 CLIENT_ID = os.environ['CLIENT_ID']
 CLIENT_SECRET = os.environ['CLIENT_SECRET']
 CODE = 0
-TOKEN_LINK = 'https://lms.ecornell.com/login/oauth2/token'
-REDIRECT_LINK = 'https://lms.ecornell.com/login/oauth2/auth?client_id='+CLIENT_ID+'&response_type=code&state=YYY&redirect_uri=https://dreamworthie-populate-canvas.herokuapp.com/oauth2response'
+TOKEN_LINK = 'https://https://ecornell.beta.instructure.com/login/oauth2/token'
+REDIRECT_LINK = 'https://https://ecornell.beta.instructure.com/login/oauth2/auth?client_id='+CLIENT_ID+'&response_type=code&state=YYY&redirect_uri=https://dreamworthie-populate-canvas.herokuapp.com/oauth2response'
 
 def success_response(data, code=200):
     return json.dumps({"success": True, "data": data}), code
@@ -88,7 +88,7 @@ def oauth():
     global CODE
     CODE = request.args.get('code', None)
     # socketio.emit('my response', {'code': code, 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET})
-    return redirect('https://dreamworthie.com/wait')
+    return redirect('https://www.dreamworthie.com/wait')
     # return success_response(CODE)
 
 @app.route('/home', methods=['POST'])
